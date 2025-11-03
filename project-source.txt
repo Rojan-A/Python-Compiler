@@ -366,6 +366,7 @@ const statusIndicator = document.getElementById("status-indicator");
 
 const NO_OUTPUT_PLACEHOLDER = "[no output]";
 const DEFAULT_DOWNLOAD_NAME = "pymatrix_program";
+const COMPILATION_DELAY_MS = 1500;
 
 const EXAMPLES = [
     {
@@ -419,6 +420,8 @@ const EXAMPLES = [
         code: "def fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n - 1) + fibonacci(n - 2)\n\ndef show_fib(limit):\n    index = 0\n    while index < limit:\n        value = fibonacci(index)\n        if (value % 2) == 0:\n            print(\"even\", index, value)\n        else:\n            print(\"odd\", index, value)\n        index = index + 1\n\nshow_fib(6)\n"
     }
 ];
+
+let pendingRunTimer = null;
 
 initialize();
 
@@ -475,6 +478,10 @@ function registerEvents() {
 }
 
 function handleRun() {
+    if (pendingRunTimer !== null) {
+        clearTimeout(pendingRunTimer);
+        pendingRunTimer = null;
+    }
     const source = editor.value;
     clearConsole();
     if (!source.trim()) {
@@ -483,14 +490,20 @@ function handleRun() {
         return;
     }
     setStatus("running", "compiling...");
-    try {
-        const result = compileAndRun(source);
-        const finalMessage = getFinalMessage(result.logs);
-        renderConsole(result.output, finalMessage, false);
-        setStatus("success", "success");
-    } catch (error) {
-        handleError(error);
-    }
+    runBtn.disabled = true;
+    pendingRunTimer = window.setTimeout(() => {
+        try {
+            const result = compileAndRun(source);
+            const finalMessage = getFinalMessage(result.logs);
+            renderConsole(result.output, finalMessage, false);
+            setStatus("success", "success");
+        } catch (error) {
+            handleError(error);
+        } finally {
+            runBtn.disabled = false;
+            pendingRunTimer = null;
+        }
+    }, COMPILATION_DELAY_MS);
 }
 
 function handleSave() {
