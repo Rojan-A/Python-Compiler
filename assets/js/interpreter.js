@@ -32,14 +32,6 @@ class Environment {
         throw new CompilerError("Runtime", `undefined variable '${name}'`, line, null);
     }
 
-    set(name, value) {
-        if (this.values.has(name)) {
-            this.values.set(name, value);
-        } else {
-            this.values.set(name, value);
-        }
-    }
-
     get(name, line) {
         if (this.values.has(name)) {
             return this.values.get(name);
@@ -188,8 +180,6 @@ export class Interpreter {
                 return this.executeWhile(node, env);
             case "ForStatement":
                 return this.executeFor(node, env);
-            case "DoWhileStatement":
-                return this.executeDoWhile(node, env);
             case "FunctionDeclaration":
                 return this.executeFunctionDeclaration(node, env);
             case "ReturnStatement":
@@ -254,21 +244,6 @@ export class Interpreter {
             const signal = this.executeBlock(node.body, env);
             if (signal instanceof ReturnSignal) {
                 return signal;
-            }
-        }
-        return null;
-    }
-
-    executeDoWhile(node, env) {
-        while (true) {
-            const signal = this.executeBlock(node.body, env);
-            if (signal instanceof ReturnSignal) {
-                return signal;
-            }
-            const condition = this.evaluate(node.test, env);
-            this.assertBoolean(condition, node.line, "do-while condition must be boolean");
-            if (!condition) {
-                break;
             }
         }
         return null;

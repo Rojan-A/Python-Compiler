@@ -19,7 +19,6 @@ const KEYWORDS = new Set([
     "elif",
     "while",
     "for",
-    "do",
     "in",
     "def",
     "return",

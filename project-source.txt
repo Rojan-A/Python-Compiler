@@ -55,7 +55,7 @@ Generated on 2025-11-03
                 <li>Variables &amp; arithmetic</li>
                 <li>Print statements</li>
                 <li>If/Elif/Else conditionals</li>
-                <li>While &amp; do-while loops</li>
+                <li>While loops</li>
                 <li>For loops with range()</li>
                 <li>Lists (arrays)</li>
                 <li>Functions &amp; returns</li>
@@ -389,11 +389,6 @@ const EXAMPLES = [
         code: "count = 1\nlimit = 5\ntotal = 0\nsquares = []\nwhile count <= limit:\n    squares = squares + [count * count]\n    total = total + count\n    print(\"count =\", count, \"square =\", count * count)\n    count = count + 1\nprint(\"sum =\", total)\nprint(\"squares =\", squares)\n"
     },
     {
-        id: "do-while",
-        label: "Do-While Loop",
-        code: "number = 4\nfactorial = 1\ndo:\n    factorial = factorial * number\n    print(\"step:\", number, \"factorial =\", factorial)\n    number = number - 1\nwhile number > 0\nprint(\"final factorial =\", factorial)\n"
-    },
-    {
         id: "for-loop",
         label: "For Loop",
         code: "values = [3, 6, 9, 12, 15]\ntotal = 0\ncount = 0\nfor value in values:\n    total = total + value\n    count = count + 1\n    print(\"adding\", value, \"-> total =\", total)\nprint(\"count =\", count)\nprint(\"average =\", total / count)\n"
@@ -666,14 +661,6 @@ class Environment {
             return;
         }
         throw new CompilerError("Runtime", `undefined variable '${name}'`, line, null);
-    }
-
-    set(name, value) {
-        if (this.values.has(name)) {
-            this.values.set(name, value);
-        } else {
-            this.values.set(name, value);
-        }
     }
 
     get(name, line) {
@@ -1863,7 +1850,7 @@ Interactive single-page playground that simulates a miniature Python compiler pi
 ## Features
 
 - **Lexical analysis** with indentation tracking, keyword/operator recognition, number and string literals, and friendly lexical error reporting.
-- **Recursive-descent parser** that builds an AST with operator precedence, control flow (if/elif/else, for, while, do-while), function declarations, and helpful syntax diagnostics.
+- **Recursive-descent parser** that builds an AST with operator precedence, control flow (if/elif/else, for, while), function declarations, and helpful syntax diagnostics.
 - **Interpreter/runtime** that executes the AST with variable scoping, functions, multiple loop forms, conditional logic, and lightweight type checks.
 - **List handling** via Python-style literals, indexing, and concatenation semantics.
 - **Diagnostics panel** that surfaces compilation timings, runtime logs, and error messages using the themed color palette.

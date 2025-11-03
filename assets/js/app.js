@@ -34,11 +34,6 @@ const EXAMPLES = [
         code: "count = 1\nlimit = 5\ntotal = 0\nsquares = []\nwhile count <= limit:\n    squares = squares + [count * count]\n    total = total + count\n    print(\"count =\", count, \"square =\", count * count)\n    count = count + 1\nprint(\"sum =\", total)\nprint(\"squares =\", squares)\n"
     },
     {
-        id: "do-while",
-        label: "Do-While Loop",
-        code: "number = 4\nfactorial = 1\ndo:\n    factorial = factorial * number\n    print(\"step:\", number, \"factorial =\", factorial)\n    number = number - 1\nwhile number > 0\nprint(\"final factorial =\", factorial)\n"
-    },
-    {
         id: "for-loop",
         label: "For Loop",
         code: "values = [3, 6, 9, 12, 15]\ntotal = 0\ncount = 0\nfor value in values:\n    total = total + value\n    count = count + 1\n    print(\"adding\", value, \"-> total =\", total)\nprint(\"count =\", count)\nprint(\"average =\", total / count)\n"

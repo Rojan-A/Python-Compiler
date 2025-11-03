@@ -7,7 +7,7 @@ A hands-on playground we built to explore how Python compilers work. This single
 This project lets you write Python code and see exactly how a compiler processes it:
 
 - The **lexer** breaks your code into tokens, handling indentation, keywords, operators, and literals while providing clear error messages when something goes wrong.
-- The **parser** transforms those tokens into an abstract syntax tree (AST), supporting all the essentials: operator precedence, control flow statements (if/elif/else, for, while, do-while), function declarations, and helpful diagnostics.
+- The **parser** transforms those tokens into an abstract syntax tree (AST), supporting all the essentials: operator precedence, control flow statements (if/elif/else, for, while), function declarations, and helpful diagnostics.
 - The **interpreter** runs your code with proper variable scoping, function calls, loops, conditionals, and basic type checking.
 - **Lists** work just like in Python, with familiar syntax for creating, indexing, and concatenating.
 - The **diagnostics panel** shows you compilation times, runtime logs, and error messages in the themed color scheme.

@@ -36,9 +36,6 @@ class Parser {
         if (this.checkKeyword("for")) {
             return this.parseForStatement();
         }
-        if (this.checkKeyword("do")) {
-            return this.parseDoWhileStatement();
-        }
         if (this.checkKeyword("def")) {
             return this.parseFunctionDeclaration();
         }
@@ -118,22 +115,6 @@ class Parser {
             iterable,
             body,
             line: forToken.line
-        };
-    }
-
-    parseDoWhileStatement() {
-        const doToken = this.consumeKeyword("do", "expected 'do'");
-        this.consumeDelimiter(":", "expected ':' after 'do'");
-        const body = this.parseSuite();
-        this.consumeNewlines();
-        this.consumeKeyword("while", "expected 'while' after do block");
-        const test = this.parseExpression();
-        this.expectLineTerminator("expected newline after do-while");
-        return {
-            type: "DoWhileStatement",
-            body,
-            test,
-            line: doToken.line
         };
     }
 
