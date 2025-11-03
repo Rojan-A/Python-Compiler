@@ -1,0 +1,1902 @@
+PyMatrix Compiler – Source Archive
+Generated on 2025-11-03
+
+===== File: index.html =====
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PyMatrix Compiler</title>
+    <link rel="stylesheet" href="assets/css/theme.css" />
+</head>
+<body>
+    <header class="top-bar">
+        <div class="branding">
+            <img src="assets/img/Python Logo.png" alt="PyMatrix logo" class="brand-logo" />
+            <div class="brand-text">
+                <span class="brand-title">PyMatrix Compiler</span>
+                <span class="brand-subtitle">Python Basics Lab</span>
+            </div>
+        </div>
+        <div class="status-indicator" id="status-indicator">ready</div>
+    </header>
+
+    <main class="workspace">
+        <section class="editor-panel">
+            <div class="panel-header">
+                <span>Source Code</span>
+                <select id="example-select" class="example-select">
+                    <option value="custom">Custom code</option>
+                </select>
+            </div>
+            <textarea id="source-editor" spellcheck="false"></textarea>
+            <div class="controls">
+                <button class="primary-btn" id="run-btn">Run Program</button>
+                <button class="icon-btn" id="save-btn" type="button" aria-label="Download source">
+                    <img src="assets/img/icon-save.svg" alt="" />
+                </button>
+                <button class="secondary-btn" id="reset-btn">Reset</button>
+            </div>
+        </section>
+
+        <section class="output-panel">
+            <div class="panel-header">
+                <span>Output</span>
+            </div>
+            <pre class="output-console" id="output-console"></pre>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-section">
+            <span class="footer-title">Feature Checklist</span>
+            <ul>
+                <li>Variables &amp; arithmetic</li>
+                <li>Print statements</li>
+                <li>If/Elif/Else conditionals</li>
+                <li>While &amp; do-while loops</li>
+                <li>For loops with range()</li>
+                <li>Lists (arrays)</li>
+                <li>Functions &amp; returns</li>
+                <li>Type checking &amp; diagnostics</li>
+            </ul>
+        </div>
+    </footer>
+
+    <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
+
+===== File: assets\css\theme.css =====
+:root {
+    --bg: #0d0f0e;
+    --primary-text: #00ff41;
+    --keyword: #4caf50;
+    --string: #8bc34a;
+    --comment: #387539;
+    --identifier: #80e27e;
+    --output: #ccffcc;
+    --error: #ff6b6b;
+    --success: #00ff41;
+    --panel-bg: #111412;
+    --panel-border: #1f3220;
+    --card-bg: rgba(17, 20, 18, 0.85);
+    --accent: #1b3320;
+    --font-body: "Fira Code", "Cascadia Code", Consolas, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--primary-text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    letter-spacing: 0.02em;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--panel-border);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.branding {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.brand-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0, 255, 65, 0.25);
+    background: var(--card-bg);
+    padding: 4px;
+    border: 1px solid var(--panel-border);
+}
+
+.brand-title {
+    font-size: 1.1rem;
+    color: var(--success);
+}
+
+.brand-subtitle {
+    font-size: 0.75rem;
+    color: var(--comment);
+}
+
+.status-indicator {
+    padding: 0.25rem 0.8rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    background: var(--accent);
+    color: var(--output);
+    font-size: 0.75rem;
+}
+
+.status-indicator[data-state="error"] {
+    color: var(--error);
+    border-color: var(--error);
+    background: rgba(255, 107, 107, 0.08);
+}
+
+.status-indicator[data-state="success"] {
+    color: var(--success);
+    border-color: var(--success);
+}
+
+.status-indicator[data-state="running"] {
+    color: var(--keyword);
+    border-color: var(--keyword);
+}
+
+.status-indicator[data-state="ready"],
+.status-indicator[data-state="idle"] {
+    color: var(--output);
+}
+
+.workspace {
+    display: grid;
+    grid-template-columns: minmax(320px, 45%) 1fr;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    flex: 1;
+}
+
+.editor-panel,
+.app-footer {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    box-shadow: inset 0 0 12px rgba(0, 255, 65, 0.05);
+}
+
+.output-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    box-shadow: inset 0 0 12px rgba(0, 255, 65, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--panel-border);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--comment);
+}
+
+textarea {
+    width: 100%;
+    min-height: 340px;
+    background: var(--card-bg);
+    border: 1px solid var(--panel-border);
+    color: var(--primary-text);
+    font: 0.95rem/1.5 var(--font-body);
+    padding: 1rem;
+    resize: vertical;
+}
+
+.controls {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-top: 1px solid var(--panel-border);
+}
+
+button {
+    font: 0.85rem var(--font-body);
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-transform: uppercase;
+    border-radius: 4px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:focus-visible {
+    outline: 2px solid var(--success);
+    outline-offset: 2px;
+}
+
+.primary-btn {
+    background: var(--success);
+    color: #041102;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    box-shadow: 0 0 6px rgba(0, 255, 65, 0.4);
+}
+
+.secondary-btn {
+    background: transparent;
+    color: var(--primary-text);
+    border: 1px solid var(--panel-border);
+    padding: 0.6rem 1rem;
+}
+
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--panel-border);
+    padding: 0.45rem;
+    width: 2.4rem;
+    height: 2.4rem;
+}
+
+.icon-btn img {
+    width: 1.25rem;
+    height: 1.25rem;
+    filter: drop-shadow(0 0 6px rgba(0, 255, 65, 0.2));
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+
+.example-select {
+    background: var(--card-bg);
+    border: 1px solid var(--panel-border);
+    color: var(--primary-text);
+    font: 0.8rem var(--font-body);
+    padding: 0.45rem 0.6rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.output-console {
+    margin: 0;
+    flex: 1;
+    padding: 1rem;
+    background: var(--card-bg);
+    border-top: 1px solid var(--panel-border);
+    color: var(--output);
+    font-size: 0.9rem;
+    overflow: auto;
+}
+
+.output-console .console-status {
+    font-style: italic;
+    color: var(--success);
+}
+
+.output-console .console-status.error {
+    color: var(--error);
+}
+
+.app-footer {
+    margin: 0 1.5rem 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+    padding: 1rem 1.5rem;
+}
+
+.footer-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.footer-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--comment);
+}
+
+footer ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--identifier);
+    font-size: 0.8rem;
+}
+
+@media (max-width: 980px) {
+    .workspace {
+        grid-template-columns: 1fr;
+    }
+
+    textarea {
+        min-height: 280px;
+    }
+
+    .app-footer {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+===== File: assets\js\app.js =====
+import { compileAndRun } from "./compiler.js";
+import { CompilerError } from "./errors.js";
+
+const editor = document.getElementById("source-editor");
+const runBtn = document.getElementById("run-btn");
+const resetBtn = document.getElementById("reset-btn");
+const saveBtn = document.getElementById("save-btn");
+const exampleSelect = document.getElementById("example-select");
+const outputConsole = document.getElementById("output-console");
+const statusIndicator = document.getElementById("status-indicator");
+
+const NO_OUTPUT_PLACEHOLDER = "[no output]";
+const DEFAULT_DOWNLOAD_NAME = "pymatrix_program";
+
+const EXAMPLES = [
+    {
+        id: "print",
+        label: "PRINT",
+        code: "greetings = \"Hello PyMatrix\"\ndeveloper = \"Group 6\"\ncourse = \"Principles of Programming Languages\"\nprogram = \"BS in Computer Science\"\nproject = \"Interpreter or Compiler Simulation\"\nprint(\"=== PyMatrix Compiler Demo ===\")\nprint(greetings)\nprint(\"Developed by:\", developer)\nprint(\"Course:\", course)\nprint(\"Degree Program:\", program)\nprint(\"Project:\", project)\nprint(\"==============================\")\n"
+    },
+    {
+        id: "variables-arithmetic",
+        label: "Variables & Arithmetic",
+        code: "a = 10\nb = 3\nc = 5\nd = 2\nsum_ab = a + b\nmix = sum_ab * c - d\naverage = (a + b + c + d) / 4\nprint(\"values:\", a, b, c, d)\nprint(\"sum_ab =\", sum_ab)\nprint(\"mix =\", mix)\nprint(\"average =\", average)\n"
+    },
+    {
+        id: "if-else",
+        label: "If-Elif-Else",
+        code: "score = 78\nbonus = 5\nfinal = score + bonus\nif final >= 90:\n    print(\"grade: A\")\nelif final >= 80:\n    print(\"grade: B\")\nelse:\n    print(\"grade: C or below\")\nprint(\"initial score =\", score)\nprint(\"final score =\", final)\n"
+    },
+    {
+        id: "while-loop",
+        label: "While Loop",
+        code: "count = 1\nlimit = 5\ntotal = 0\nsquares = []\nwhile count <= limit:\n    squares = squares + [count * count]\n    total = total + count\n    print(\"count =\", count, \"square =\", count * count)\n    count = count + 1\nprint(\"sum =\", total)\nprint(\"squares =\", squares)\n"
+    },
+    {
+        id: "do-while",
+        label: "Do-While Loop",
+        code: "number = 4\nfactorial = 1\ndo:\n    factorial = factorial * number\n    print(\"step:\", number, \"factorial =\", factorial)\n    number = number - 1\nwhile number > 0\nprint(\"final factorial =\", factorial)\n"
+    },
+    {
+        id: "for-loop",
+        label: "For Loop",
+        code: "values = [3, 6, 9, 12, 15]\ntotal = 0\ncount = 0\nfor value in values:\n    total = total + value\n    count = count + 1\n    print(\"adding\", value, \"-> total =\", total)\nprint(\"count =\", count)\nprint(\"average =\", total / count)\n"
+    },
+    {
+        id: "nested-loops",
+        label: "Nested Loops",
+        code: "outer = 1\nwhile outer <= 2:\n    inner = 1\n    print(\"row\", outer, \"start\")\n    while inner <= 3:\n        print(\"cell\", outer, inner)\n        inner = inner + 1\n    print(\"row\", outer, \"done\")\n    outer = outer + 1\nprint(\"grid complete\")\n"
+    },
+    {
+        id: "lists",
+        label: "Lists",
+        code: "numbers = [3, 5, 8, 13]\nnumbers = numbers + [21]\nnames = [\"Neo\", \"Trinity\", \"Morpheus\", \"Cypher\"]\nindex = 0\nwhile index < 4:\n    print(\"pair:\", names[index], numbers[index])\n    index = index + 1\nprint(\"first =\", numbers[0])\nprint(\"last =\", numbers[3])\nprint(\"extended =\", numbers)\n"
+    },
+    {
+        id: "functions",
+        label: "Functions",
+        code: "def greet(name):\n    print(\"Hello\", name)\n    print(\"Welcome to PyMatrix\")\n    print(\"Enjoy exploring loops\")\nprint(\"Preparing greetings\")\ngreet(\"Neo\")\ngreet(\"Trinity\")\ngreet(\"Morpheus\")\nprint(\"All greetings sent\")\n"
+    },
+    {
+        id: "function-return",
+        label: "Function with Return",
+        code: "def square(x):\n    return x * x\n\ndef describe(value):\n    squared = square(value)\n    print(\"value =\", value)\n    print(\"square =\", squared)\n    return squared\nnumbers = [2, 4, 6]\nresults = []\nfor num in numbers:\n    results = results + [describe(num)]\nprint(\"results =\", results)\n"
+    },
+    {
+        id: "complete-program",
+        label: "Complete Program",
+        code: "def fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n - 1) + fibonacci(n - 2)\n\ndef show_fib(limit):\n    index = 0\n    while index < limit:\n        value = fibonacci(index)\n        if (value % 2) == 0:\n            print(\"even\", index, value)\n        else:\n            print(\"odd\", index, value)\n        index = index + 1\n\nshow_fib(6)\n"
+    }
+];
+
+initialize();
+
+function initialize() {
+    populateExampleMenu();
+    loadInitialExample();
+    registerEvents();
+    setStatus("ready", "ready");
+}
+
+function populateExampleMenu() {
+    EXAMPLES.forEach((example) => {
+        const option = document.createElement("option");
+        option.value = example.id;
+        option.textContent = example.label;
+        exampleSelect.append(option);
+    });
+}
+
+function loadInitialExample() {
+    const firstExample = EXAMPLES[0];
+    exampleSelect.value = firstExample.id;
+    editor.value = firstExample.code;
+    clearConsole();
+}
+
+function registerEvents() {
+    runBtn.addEventListener("click", () => {
+        handleRun();
+    });
+
+    resetBtn.addEventListener("click", () => {
+        exampleSelect.value = "custom";
+        editor.value = "";
+        clearConsole();
+        setStatus("ready", "ready");
+    });
+
+    saveBtn.addEventListener("click", () => {
+        handleSave();
+    });
+
+    exampleSelect.addEventListener("change", () => {
+        if (exampleSelect.value === "custom") {
+            return;
+        }
+        const selection = EXAMPLES.find((example) => example.id === exampleSelect.value);
+        if (selection) {
+            editor.value = selection.code;
+            clearConsole();
+            setStatus("ready", selection.label.toLowerCase());
+        }
+    });
+}
+
+function handleRun() {
+    const source = editor.value;
+    clearConsole();
+    if (!source.trim()) {
+        outputConsole.textContent = "Provide some Python code to compile.";
+        setStatus("idle", "waiting");
+        return;
+    }
+    setStatus("running", "compiling...");
+    try {
+        const result = compileAndRun(source);
+        const finalMessage = getFinalMessage(result.logs);
+        renderConsole(result.output, finalMessage, false);
+        setStatus("success", "success");
+    } catch (error) {
+        handleError(error);
+    }
+}
+
+function handleSave() {
+    const source = editor.value;
+    const fileName = buildDownloadFileName();
+    triggerDownload(source, fileName);
+    setStatus("success", "downloaded");
+}
+
+function buildDownloadFileName() {
+    const activeId = exampleSelect.value;
+    if (activeId && activeId !== "custom") {
+        return `${activeId}.py`;
+    }
+    const timestamp = formatTimestamp(new Date());
+    return `${DEFAULT_DOWNLOAD_NAME}_${timestamp}.py`;
+}
+
+function formatTimestamp(date) {
+    return [
+        date.getFullYear(),
+        padNumber(date.getMonth() + 1),
+        padNumber(date.getDate()),
+        padNumber(date.getHours()),
+        padNumber(date.getMinutes()),
+        padNumber(date.getSeconds())
+    ].join("");
+}
+
+function padNumber(value) {
+    return String(value).padStart(2, "0");
+}
+
+function triggerDownload(content, fileName) {
+    const blob = new Blob([content], { type: "text/x-python;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function renderConsole(outputLines, message, isError = false) {
+    const lines = outputLines && outputLines.length > 0 ? outputLines : [NO_OUTPUT_PLACEHOLDER];
+    const safeLines = lines.map((line) => escapeHtml(line));
+    const parts = [];
+    parts.push(safeLines.join("<br>"));
+    parts.push("<br><br>");
+    parts.push(`<em class="console-status${isError ? " error" : ""}">${escapeHtml(message)}</em>`);
+    outputConsole.innerHTML = parts.join("");
+}
+
+function handleError(error) {
+    if (error instanceof CompilerError) {
+        renderConsole(
+            [error.message],
+            "Compilation failed.",
+            true
+        );
+        setStatus("error", "error");
+    } else {
+        console.error(error);
+        renderConsole(
+            ["Unexpected failure. Check console for details."],
+            "Compilation failed.",
+            true
+        );
+        setStatus("error", "fatal error");
+    }
+}
+
+function clearConsole() {
+    outputConsole.innerHTML = "";
+}
+
+function setStatus(state, text) {
+    statusIndicator.dataset.state = state;
+    statusIndicator.textContent = text;
+}
+
+function getFinalMessage(logs) {
+    if (!Array.isArray(logs) || logs.length === 0) {
+        return "Execution finished.";
+    }
+    const lastEntry = logs[logs.length - 1];
+    if (!lastEntry || typeof lastEntry.message !== "string") {
+        return "Execution finished.";
+    }
+    return lastEntry.message;
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+===== File: assets\js\compiler.js =====
+import { lex } from "./lexer.js";
+import { parse } from "./parser.js";
+import { Interpreter } from "./interpreter.js";
+
+export function compileAndRun(source) {
+    const tokens = lex(source);
+    const ast = parse(tokens);
+    const interpreter = new Interpreter();
+    const execution = interpreter.run(ast);
+    return {
+        output: execution.output,
+        logs: execution.logs
+    };
+}
+
+===== File: assets\js\errors.js =====
+export class CompilerError extends Error {
+    constructor(stage, message, line = null, column = null) {
+        const location = line !== null ? ` (line ${line}${column !== null ? ", col " + column : ""})` : "";
+        super(`${stage} error${location}: ${message}`);
+        this.name = "CompilerError";
+        this.stage = stage;
+        this.line = line;
+        this.column = column;
+    }
+}
+
+export class ReturnSignal {
+    constructor(value = null) {
+        this.value = value;
+    }
+}
+
+===== File: assets\js\interpreter.js =====
+import { CompilerError, ReturnSignal } from "./errors.js";
+
+class Environment {
+    constructor(parent = null) {
+        this.parent = parent;
+        this.values = new Map();
+    }
+
+    has(name) {
+        if (this.values.has(name)) {
+            return true;
+        }
+        if (this.parent) {
+            return this.parent.has(name);
+        }
+        return false;
+    }
+
+    define(name, value) {
+        this.values.set(name, value);
+    }
+
+    assign(name, value, line) {
+        if (this.values.has(name)) {
+            this.values.set(name, value);
+            return;
+        }
+        if (this.parent) {
+            this.parent.assign(name, value, line);
+            return;
+        }
+        throw new CompilerError("Runtime", `undefined variable '${name}'`, line, null);
+    }
+
+    set(name, value) {
+        if (this.values.has(name)) {
+            this.values.set(name, value);
+        } else {
+            this.values.set(name, value);
+        }
+    }
+
+    get(name, line) {
+        if (this.values.has(name)) {
+            return this.values.get(name);
+        }
+        if (this.parent) {
+            return this.parent.get(name, line);
+        }
+        throw new CompilerError("Runtime", `undefined variable '${name}'`, line, null);
+    }
+}
+
+class UserFunction {
+    constructor(declaration, closure) {
+        this.declaration = declaration;
+        this.closure = closure;
+    }
+
+    call(interpreter, args, callNode) {
+        const expected = this.declaration.params.length;
+        if (args.length !== expected) {
+            throw new CompilerError(
+                "Runtime",
+                `function '${this.declaration.name}' expects ${expected} argument(s) but got ${args.length}`,
+                callNode.line,
+                null
+            );
+        }
+        const localEnv = new Environment(this.closure);
+        this.declaration.params.forEach((param, index) => {
+            localEnv.define(param.name, args[index]);
+        });
+    const signal = interpreter.executeBlock(this.declaration.body, localEnv);
+        if (signal instanceof ReturnSignal) {
+            return signal.value;
+        }
+        return null;
+    }
+}
+
+export class Interpreter {
+    constructor() {
+        this.reset();
+    }
+
+    reset() {
+        this.output = [];
+        this.logs = [];
+        this.globalEnv = new Environment();
+        this.installBuiltins();
+    }
+
+    installBuiltins() {
+        const printFn = {
+            arity: null,
+            call: (interpreter, args) => {
+                const rendered = args.map((value) => interpreter.repr(value)).join(" ");
+                interpreter.output.push(rendered);
+                return null;
+            }
+        };
+        this.globalEnv.define("print", printFn);
+        this.globalEnv.define("True", true);
+        this.globalEnv.define("False", false);
+        this.globalEnv.define("None", null);
+    }
+
+    run(program) {
+        this.reset();
+        try {
+            this.executeBlock(program.body, this.globalEnv);
+            this.logs.push({ level: "success", message: "Execution completed successfully." });
+            return { output: this.output, logs: this.logs };
+        } catch (error) {
+            if (error instanceof CompilerError) {
+                throw error;
+            }
+            throw new CompilerError("Runtime", error.message);
+        }
+    }
+
+    executeBlock(statements, environment) {
+        for (const statement of statements) {
+            const result = this.execute(statement, environment);
+            if (result instanceof ReturnSignal) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    execute(node, env) {
+        switch (node.type) {
+            case "Assignment":
+                return this.executeAssignment(node, env);
+            case "ExpressionStatement":
+                this.evaluate(node.expression, env);
+                return null;
+            case "IfStatement":
+                return this.executeIf(node, env);
+            case "WhileStatement":
+                return this.executeWhile(node, env);
+            case "FunctionDeclaration":
+                return this.executeFunctionDeclaration(node, env);
+            case "ReturnStatement":
+                return this.executeReturn(node, env);
+            default:
+                throw new CompilerError("Runtime", `unsupported statement type '${node.type}'`, node.line, null);
+        }
+    }
+
+    executeAssignment(node, env) {
+        const value = this.evaluate(node.value, env);
+        if (env.has(node.target)) {
+            env.assign(node.target, value, node.line);
+        } else {
+            env.define(node.target, value);
+        }
+        return null;
+    }
+
+    executeIf(node, env) {
+        const condition = this.evaluate(node.test, env);
+        this.assertBoolean(condition, node.line, "if condition must be boolean");
+        if (condition) {
+            return this.executeBlock(node.consequent, env);
+        }
+        if (node.alternate) {
+            return this.executeBlock(node.alternate, env);
+        }
+        return null;
+    }
+
+    executeWhile(node, env) {
+        while (true) {
+            const condition = this.evaluate(node.test, env);
+            this.assertBoolean(condition, node.line, "while condition must be boolean");
+            if (!condition) {
+                break;
+            }
+            const signal = this.executeBlock(node.body, env);
+            if (signal instanceof ReturnSignal) {
+                return signal;
+            }
+        }
+        return null;
+    }
+
+    executeFunctionDeclaration(node, env) {
+        const fn = new UserFunction(node, env);
+        env.define(node.name, fn);
+        return null;
+    }
+
+    executeReturn(node, env) {
+        const value = node.argument ? this.evaluate(node.argument, env) : null;
+        return new ReturnSignal(value);
+    }
+
+    evaluate(node, env) {
+        switch (node.type) {
+            case "NumberLiteral":
+                return node.value;
+            case "StringLiteral":
+                return node.value;
+            case "BooleanLiteral":
+                return node.value;
+            case "NoneLiteral":
+                return null;
+            case "Identifier":
+                return env.get(node.name, node.line);
+            case "ListLiteral":
+                return node.elements.map((element) => this.evaluate(element, env));
+            case "BinaryExpression":
+                return this.evaluateBinary(node, env);
+            case "LogicalExpression":
+                return this.evaluateLogical(node, env);
+            case "UnaryExpression":
+                return this.evaluateUnary(node, env);
+            case "CallExpression":
+                return this.evaluateCall(node, env);
+            case "SubscriptExpression":
+                return this.evaluateSubscript(node, env);
+            default:
+                throw new CompilerError("Runtime", `unsupported expression type '${node.type}'`, node.line, null);
+        }
+    }
+
+    evaluateBinary(node, env) {
+        const left = this.evaluate(node.left, env);
+        const right = this.evaluate(node.right, env);
+        switch (node.operator) {
+            case "+":
+                if (typeof left === "number" && typeof right === "number") {
+                    return left + right;
+                }
+                if (typeof left === "string" && typeof right === "string") {
+                    return left + right;
+                }
+                if (Array.isArray(left) && Array.isArray(right)) {
+                    return [...left, ...right];
+                }
+                throw new CompilerError("Runtime", "'+' expects both numbers, both strings, or both lists", node.line, null);
+            case "-":
+                this.assertNumber(left, node.line, "left operand of '-' must be a number");
+                this.assertNumber(right, node.line, "right operand of '-' must be a number");
+                return left - right;
+            case "*":
+                this.assertNumber(left, node.line, "left operand of '*' must be a number");
+                this.assertNumber(right, node.line, "right operand of '*' must be a number");
+                return left * right;
+            case "/":
+                this.assertNumber(left, node.line, "left operand of '/' must be a number");
+                this.assertNumber(right, node.line, "right operand of '/' must be a number");
+                if (right === 0) {
+                    throw new CompilerError("Runtime", "division by zero", node.line, null);
+                }
+                return left / right;
+            case "%":
+                this.assertNumber(left, node.line, "left operand of '%' must be a number");
+                this.assertNumber(right, node.line, "right operand of '%' must be a number");
+                if (right === 0) {
+                    throw new CompilerError("Runtime", "modulo by zero", node.line, null);
+                }
+                return left % right;
+            case "==":
+                return left === right;
+            case "!=":
+                return left !== right;
+            case "<":
+            case "<=":
+            case ">":
+            case ">=":
+                this.assertNumber(left, node.line, `left operand of '${node.operator}' must be a number`);
+                this.assertNumber(right, node.line, `right operand of '${node.operator}' must be a number`);
+                switch (node.operator) {
+                    case "<":
+                        return left < right;
+                    case "<=":
+                        return left <= right;
+                    case ">":
+                        return left > right;
+                    case ">=":
+                        return left >= right;
+                    default:
+                        return false;
+                }
+            default:
+                throw new CompilerError("Runtime", `unsupported operator '${node.operator}'`, node.line, null);
+        }
+    }
+
+    evaluateSubscript(node, env) {
+        const target = this.evaluate(node.object, env);
+        const indexValue = this.evaluate(node.index, env);
+        this.assertInteger(indexValue, node.line, "index must be an integer");
+        const index = indexValue;
+        if (Array.isArray(target)) {
+            this.assertBounds(index, target.length, node.line, "list index out of range");
+            return target[index];
+        }
+        if (typeof target === "string") {
+            this.assertBounds(index, target.length, node.line, "string index out of range");
+            return target.charAt(index);
+        }
+        throw new CompilerError("Runtime", "object is not subscriptable", node.line, null);
+    }
+
+    evaluateLogical(node, env) {
+        if (node.operator === "and") {
+            const left = this.evaluate(node.left, env);
+            this.assertBoolean(left, node.line, "left operand of 'and' must be boolean");
+            if (!left) {
+                return false;
+            }
+            const right = this.evaluate(node.right, env);
+            this.assertBoolean(right, node.line, "right operand of 'and' must be boolean");
+            return left && right;
+        }
+        if (node.operator === "or") {
+            const left = this.evaluate(node.left, env);
+            this.assertBoolean(left, node.line, "left operand of 'or' must be boolean");
+            if (left) {
+                return true;
+            }
+            const right = this.evaluate(node.right, env);
+            this.assertBoolean(right, node.line, "right operand of 'or' must be boolean");
+            return left || right;
+        }
+        throw new CompilerError("Runtime", `unsupported logical operator '${node.operator}'`, node.line, null);
+    }
+
+    evaluateUnary(node, env) {
+        const argument = this.evaluate(node.argument, env);
+        switch (node.operator) {
+            case "not":
+                this.assertBoolean(argument, node.line, "'not' operand must be boolean");
+                return !argument;
+            case "-":
+                this.assertNumber(argument, node.line, "unary '-' operand must be a number");
+                return -argument;
+            case "+":
+                this.assertNumber(argument, node.line, "unary '+' operand must be a number");
+                return +argument;
+            default:
+                throw new CompilerError("Runtime", `unsupported unary operator '${node.operator}'`, node.line, null);
+        }
+    }
+
+    evaluateCall(node, env) {
+        const callee = this.evaluate(node.callee, env);
+        const args = node.arguments.map((arg) => this.evaluate(arg, env));
+        if (callee instanceof UserFunction) {
+            return callee.call(this, args, node);
+        }
+        if (callee && typeof callee.call === "function") {
+            return callee.call(this, args, node);
+        }
+        throw new CompilerError("Runtime", "attempted to call a non-callable value", node.line, null);
+    }
+
+    assertNumber(value, line, message) {
+        if (typeof value !== "number" || Number.isNaN(value)) {
+            throw new CompilerError("Runtime", message, line, null);
+        }
+    }
+
+    assertBoolean(value, line, message) {
+        if (typeof value !== "boolean") {
+            throw new CompilerError("Runtime", message, line, null);
+        }
+    }
+
+    assertInteger(value, line, message) {
+        if (typeof value !== "number" || !Number.isInteger(value)) {
+            throw new CompilerError("Runtime", message, line, null);
+        }
+    }
+
+    assertBounds(index, length, line, message) {
+        if (index < 0 || index >= length) {
+            throw new CompilerError("Runtime", message, line, null);
+        }
+    }
+
+    repr(value) {
+        if (value === null) {
+            return "None";
+        }
+        if (typeof value === "boolean") {
+            return value ? "True" : "False";
+        }
+        if (typeof value === "string") {
+            return value;
+        }
+        if (Array.isArray(value)) {
+            const rendered = value.map((item) => this.repr(item)).join(", ");
+            return `[${rendered}]`;
+        }
+        return String(value);
+    }
+}
+
+===== File: assets\js\lexer.js =====
+import { CompilerError } from "./errors.js";
+
+export const TokenType = {
+    IDENTIFIER: "IDENTIFIER",
+    KEYWORD: "KEYWORD",
+    NUMBER: "NUMBER",
+    STRING: "STRING",
+    OPERATOR: "OPERATOR",
+    DELIMITER: "DELIMITER",
+    NEWLINE: "NEWLINE",
+    INDENT: "INDENT",
+    DEDENT: "DEDENT",
+    EOF: "EOF"
+};
+
+const KEYWORDS = new Set([
+    "if",
+    "else",
+    "elif",
+    "while",
+    "def",
+    "return",
+    "print",
+    "and",
+    "or",
+    "not",
+    "True",
+    "False",
+    "None"
+]);
+
+const MULTI_CHAR_OPERATORS = ["==", "!=", "<=", ">=", "//", "**"];
+
+const SINGLE_CHAR_OPERATORS = new Set(["+", "-", "*", "/", "%", "=", "<", ">"]);
+
+const DELIMITERS = new Set(["(", ")", "[", "]", ":", ","]);
+
+function sanitize(source) {
+    return source.replace(/\r\n?/g, "\n");
+}
+
+function isAlpha(ch) {
+    return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || ch === "_";
+}
+
+function isDigit(ch) {
+    return ch >= "0" && ch <= "9";
+}
+
+function isAlphaNumeric(ch) {
+    return isAlpha(ch) || isDigit(ch);
+}
+
+function createToken(type, value, line, column) {
+    return { type, value, line, column };
+}
+
+export function lex(source) {
+    const tokens = [];
+    const indentStack = [0];
+    const text = sanitize(source);
+    const lines = text.split("\n");
+
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const rawLine = lines[lineIndex];
+        const logicalLine = lineIndex + 1;
+        let cursor = 0;
+        let column = 1;
+        let indentCount = 0;
+
+        while (cursor < rawLine.length && (rawLine[cursor] === " " || rawLine[cursor] === "\t")) {
+            indentCount += rawLine[cursor] === "\t" ? 4 : 1;
+            cursor++;
+            column++;
+        }
+
+        const remaining = rawLine.slice(cursor);
+        const isCommentLine = remaining.trimStart().startsWith("#");
+        const isBlank = remaining.trim().length === 0;
+
+        if (!isBlank && !isCommentLine) {
+            if (indentCount > indentStack[indentStack.length - 1]) {
+                indentStack.push(indentCount);
+                tokens.push(createToken(TokenType.INDENT, null, logicalLine, 1));
+            } else {
+                while (indentCount < indentStack[indentStack.length - 1]) {
+                    indentStack.pop();
+                    tokens.push(createToken(TokenType.DEDENT, null, logicalLine, 1));
+                }
+
+                if (indentCount !== indentStack[indentStack.length - 1]) {
+                    throw new CompilerError(
+                        "Lexical",
+                        "inconsistent indentation",
+                        logicalLine,
+                        column
+                    );
+                }
+            }
+        }
+
+        while (cursor < rawLine.length) {
+            const ch = rawLine[cursor];
+
+            if (ch === " " || ch === "\t") {
+                cursor++;
+                column++;
+                continue;
+            }
+
+            if (ch === "#") {
+                break;
+            }
+
+            if (isAlpha(ch)) {
+                const startColumn = column;
+                let lexeme = ch;
+                cursor++;
+                column++;
+                while (cursor < rawLine.length && isAlphaNumeric(rawLine[cursor])) {
+                    lexeme += rawLine[cursor];
+                    cursor++;
+                    column++;
+                }
+                if (KEYWORDS.has(lexeme)) {
+                    tokens.push(createToken(TokenType.KEYWORD, lexeme, logicalLine, startColumn));
+                } else {
+                    tokens.push(createToken(TokenType.IDENTIFIER, lexeme, logicalLine, startColumn));
+                }
+                continue;
+            }
+
+            if (isDigit(ch) || (ch === "." && isDigit(rawLine[cursor + 1] || ""))) {
+                const startColumn = column;
+                let lexeme = "";
+                let hasDot = false;
+                while (cursor < rawLine.length) {
+                    const current = rawLine[cursor];
+                    if (isDigit(current)) {
+                        lexeme += current;
+                    } else if (current === "." && !hasDot) {
+                        hasDot = true;
+                        lexeme += current;
+                    } else {
+                        break;
+                    }
+                    cursor++;
+                    column++;
+                }
+                const value = Number(lexeme);
+                if (Number.isNaN(value)) {
+                    throw new CompilerError("Lexical", `invalid numeric literal '${lexeme}'`, logicalLine, startColumn);
+                }
+                tokens.push(createToken(TokenType.NUMBER, value, logicalLine, startColumn));
+                continue;
+            }
+
+            if (ch === "\"" || ch === "'") {
+                const quote = ch;
+                const startColumn = column;
+                cursor++;
+                column++;
+                let lexeme = "";
+                let terminated = false;
+                while (cursor < rawLine.length) {
+                    const current = rawLine[cursor];
+                    if (current === "\\") {
+                        const nextChar = rawLine[cursor + 1];
+                        if (nextChar === undefined) {
+                            throw new CompilerError("Lexical", "unterminated escape sequence", logicalLine, column);
+                        }
+                        switch (nextChar) {
+                            case "n":
+                                lexeme += "\n";
+                                break;
+                            case "t":
+                                lexeme += "\t";
+                                break;
+                            case "r":
+                                lexeme += "\r";
+                                break;
+                            case "\\":
+                                lexeme += "\\";
+                                break;
+                            case "\"":
+                                lexeme += "\"";
+                                break;
+                            case "'":
+                                lexeme += "'";
+                                break;
+                            default:
+                                lexeme += nextChar;
+                                break;
+                        }
+                        cursor += 2;
+                        column += 2;
+                    } else if (current === quote) {
+                        terminated = true;
+                        cursor++;
+                        column++;
+                        break;
+                    } else {
+                        lexeme += current;
+                        cursor++;
+                        column++;
+                    }
+                }
+
+                if (!terminated) {
+                    throw new CompilerError("Lexical", "unterminated string literal", logicalLine, startColumn);
+                }
+
+                tokens.push(createToken(TokenType.STRING, lexeme, logicalLine, startColumn));
+                continue;
+            }
+
+            const twoChar = rawLine.slice(cursor, cursor + 2);
+            if (MULTI_CHAR_OPERATORS.includes(twoChar)) {
+                tokens.push(createToken(TokenType.OPERATOR, twoChar, logicalLine, column));
+                cursor += 2;
+                column += 2;
+                continue;
+            }
+
+            if (SINGLE_CHAR_OPERATORS.has(ch)) {
+                tokens.push(createToken(TokenType.OPERATOR, ch, logicalLine, column));
+                cursor++;
+                column++;
+                continue;
+            }
+
+            if (DELIMITERS.has(ch)) {
+                tokens.push(createToken(TokenType.DELIMITER, ch, logicalLine, column));
+                cursor++;
+                column++;
+                continue;
+            }
+
+            throw new CompilerError("Lexical", `unexpected character '${ch}'`, logicalLine, column);
+        }
+
+        tokens.push(createToken(TokenType.NEWLINE, "\n", logicalLine, rawLine.length + 1));
+    }
+
+    tokens.push(createToken(TokenType.NEWLINE, "\n", lines.length + 1, 1));
+
+    while (indentStack.length > 1) {
+        indentStack.pop();
+        tokens.push(createToken(TokenType.DEDENT, null, lines.length + 1, 1));
+    }
+
+    tokens.push(createToken(TokenType.EOF, null, lines.length + 1, 1));
+    return tokens;
+}
+
+===== File: assets\js\parser.js =====
+import { CompilerError } from "./errors.js";
+import { TokenType } from "./lexer.js";
+
+export function parse(tokens) {
+    const parser = new Parser(tokens);
+    const body = parser.parseProgram();
+    return { type: "Program", body };
+}
+
+class Parser {
+    constructor(tokens) {
+        this.tokens = tokens;
+        this.current = 0;
+    }
+
+    parseProgram() {
+        const statements = [];
+        this.consumeNewlines();
+        while (!this.isAtEnd()) {
+            if (this.check(TokenType.DEDENT)) {
+                break;
+            }
+            statements.push(this.parseStatement());
+            this.consumeNewlines();
+        }
+        return statements;
+    }
+
+    parseStatement() {
+        if (this.checkKeyword("if")) {
+            return this.parseIfStatement();
+        }
+        if (this.checkKeyword("while")) {
+            return this.parseWhileStatement();
+        }
+        if (this.checkKeyword("def")) {
+            return this.parseFunctionDeclaration();
+        }
+        if (this.checkKeyword("return")) {
+            return this.parseReturnStatement();
+        }
+        return this.parseSimpleStatement();
+    }
+
+    parseIfStatement() {
+        const ifToken = this.consumeKeyword("if", "expected 'if'");
+        const test = this.parseExpression();
+        this.consumeDelimiter(":", "expected ':' after if condition");
+        const consequent = this.parseSuite();
+        let alternate = null;
+        if (this.checkKeyword("elif")) {
+            alternate = this.parseElifChain();
+        } else if (this.checkKeyword("else")) {
+            this.advance();
+            this.consumeDelimiter(":", "expected ':' after else");
+            alternate = this.parseSuite();
+        }
+        return {
+            type: "IfStatement",
+            test,
+            consequent,
+            alternate,
+            line: ifToken.line
+        };
+    }
+
+    parseElifChain() {
+        const elifToken = this.consumeKeyword("elif", "expected 'elif'");
+        const test = this.parseExpression();
+        this.consumeDelimiter(":", "expected ':' after elif condition");
+        const consequent = this.parseSuite();
+        let alternate = null;
+        if (this.checkKeyword("elif")) {
+            alternate = this.parseElifChain();
+        } else if (this.checkKeyword("else")) {
+            this.advance();
+            this.consumeDelimiter(":", "expected ':' after else");
+            alternate = this.parseSuite();
+        }
+        return {
+            type: "IfStatement",
+            test,
+            consequent,
+            alternate,
+            line: elifToken.line
+        };
+    }
+
+    parseWhileStatement() {
+        const whileToken = this.consumeKeyword("while", "expected 'while'");
+        const test = this.parseExpression();
+        this.consumeDelimiter(":", "expected ':' after while condition");
+        const body = this.parseSuite();
+        return {
+            type: "WhileStatement",
+            test,
+            body,
+            line: whileToken.line
+        };
+    }
+
+    parseFunctionDeclaration() {
+        const defToken = this.consumeKeyword("def", "expected 'def'");
+        const nameToken = this.consume(TokenType.IDENTIFIER, "expected function name");
+        this.consumeDelimiter("(", "expected '(' after function name");
+        const params = [];
+        if (!this.checkDelimiter(")")) {
+            do {
+                const paramToken = this.consume(TokenType.IDENTIFIER, "expected parameter name");
+                params.push({ name: paramToken.value, line: paramToken.line });
+            } while (this.matchDelimiter(","));
+        }
+        this.consumeDelimiter(")", "expected ')' after parameters");
+        this.consumeDelimiter(":", "expected ':' after function signature");
+        const body = this.parseSuite();
+        return {
+            type: "FunctionDeclaration",
+            name: nameToken.value,
+            params,
+            body,
+            line: defToken.line
+        };
+    }
+
+    parseReturnStatement() {
+        const token = this.consumeKeyword("return", "expected 'return'");
+        let value = null;
+        if (!this.check(TokenType.NEWLINE) && !this.check(TokenType.DEDENT) && !this.check(TokenType.EOF)) {
+            value = this.parseExpression();
+        }
+        this.expectLineTerminator("expected newline after return");
+        return {
+            type: "ReturnStatement",
+            argument: value,
+            line: token.line
+        };
+    }
+
+    parseSimpleStatement() {
+        const expression = this.parseExpression();
+        if (this.matchOperator("=")) {
+            if (expression.type !== "Identifier") {
+                throw new CompilerError(
+                    "Syntax",
+                    "assignment target must be an identifier",
+                    expression.line,
+                    null
+                );
+            }
+            const value = this.parseExpression();
+            this.expectLineTerminator("expected newline after assignment");
+            return {
+                type: "Assignment",
+                target: expression.name,
+                value,
+                line: expression.line
+            };
+        }
+        this.expectLineTerminator("expected newline after expression");
+        return {
+            type: "ExpressionStatement",
+            expression,
+            line: expression.line
+        };
+    }
+
+    parseSuite() {
+        if (this.match(TokenType.NEWLINE)) {
+            this.consume(TokenType.INDENT, "expected an indented block");
+            const statements = [];
+            this.consumeNewlines();
+            while (!this.check(TokenType.DEDENT) && !this.isAtEnd()) {
+                statements.push(this.parseStatement());
+                this.consumeNewlines();
+            }
+            this.consume(TokenType.DEDENT, "missing matching DEDENT");
+            return statements;
+        }
+        const single = this.parseSimpleStatement();
+        return [single];
+    }
+
+    parseExpression() {
+        return this.parseOr();
+    }
+
+    parseOr() {
+        let expr = this.parseAnd();
+        while (true) {
+            const keyword = this.matchKeyword("or");
+            if (!keyword) {
+                break;
+            }
+            const right = this.parseAnd();
+            expr = this.buildLogical(expr, keyword, right);
+        }
+        return expr;
+    }
+
+    parseAnd() {
+        let expr = this.parseEquality();
+        while (true) {
+            const keyword = this.matchKeyword("and");
+            if (!keyword) {
+                break;
+            }
+            const right = this.parseEquality();
+            expr = this.buildLogical(expr, keyword, right);
+        }
+        return expr;
+    }
+
+    parseEquality() {
+        let expr = this.parseComparison();
+        while (true) {
+            const operator = this.matchOperatorOneOf(["==", "!="]);
+            if (!operator) {
+                break;
+            }
+            const right = this.parseComparison();
+            expr = this.buildBinary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    parseComparison() {
+        let expr = this.parseTerm();
+        while (true) {
+            const operator = this.matchOperatorOneOf(["<", ">", "<=", ">="]);
+            if (!operator) {
+                break;
+            }
+            const right = this.parseTerm();
+            expr = this.buildBinary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    parseTerm() {
+        let expr = this.parseFactor();
+        while (true) {
+            const operator = this.matchOperatorOneOf(["+", "-"]);
+            if (!operator) {
+                break;
+            }
+            const right = this.parseFactor();
+            expr = this.buildBinary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    parseFactor() {
+        let expr = this.parseUnary();
+        while (true) {
+            const operator = this.matchOperatorOneOf(["*", "/", "%"]);
+            if (!operator) {
+                break;
+            }
+            const right = this.parseUnary();
+            expr = this.buildBinary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    parseUnary() {
+        const keyword = this.matchKeyword("not");
+        if (keyword) {
+            const argument = this.parseUnary();
+            return {
+                type: "UnaryExpression",
+                operator: "not",
+                argument,
+                line: keyword.line
+            };
+        }
+        const operator = this.matchOperatorOneOf(["-", "+"]);
+        if (operator) {
+            const argument = this.parseUnary();
+            return {
+                type: "UnaryExpression",
+                operator: operator.value,
+                argument,
+                line: operator.line
+            };
+        }
+        return this.parseCall();
+    }
+
+    parseCall() {
+        let expr = this.parsePrimary();
+        while (true) {
+            if (this.matchDelimiter("(")) {
+                const args = [];
+                if (!this.checkDelimiter(")")) {
+                    do {
+                        args.push(this.parseExpression());
+                    } while (this.matchDelimiter(","));
+                }
+                const closing = this.consumeDelimiter(")", "expected ')' to close function call");
+                expr = {
+                    type: "CallExpression",
+                    callee: expr,
+                    arguments: args,
+                    line: closing.line
+                };
+            } else if (this.matchDelimiter("[")) {
+                const bracketToken = this.previous();
+                const indexExpression = this.parseExpression();
+                this.consumeDelimiter("]", "expected ']' to close index access");
+                expr = {
+                    type: "SubscriptExpression",
+                    object: expr,
+                    index: indexExpression,
+                    line: bracketToken.line
+                };
+            } else {
+                break;
+            }
+        }
+        return expr;
+    }
+
+    parsePrimary() {
+        if (this.match(TokenType.NUMBER)) {
+            const token = this.previous();
+            return {
+                type: "NumberLiteral",
+                value: token.value,
+                line: token.line
+            };
+        }
+        if (this.match(TokenType.STRING)) {
+            const token = this.previous();
+            return {
+                type: "StringLiteral",
+                value: token.value,
+                line: token.line
+            };
+        }
+        if (this.checkKeyword("print")) {
+            const token = this.advance();
+            return {
+                type: "Identifier",
+                name: token.value,
+                line: token.line
+            };
+        }
+        if (this.checkKeyword("True") || this.checkKeyword("False")) {
+            const token = this.advance();
+            return {
+                type: "BooleanLiteral",
+                value: token.value === "True",
+                line: token.line
+            };
+        }
+        if (this.checkKeyword("None")) {
+            const token = this.advance();
+            return {
+                type: "NoneLiteral",
+                value: null,
+                line: token.line
+            };
+        }
+        if (this.match(TokenType.IDENTIFIER)) {
+            const token = this.previous();
+            return {
+                type: "Identifier",
+                name: token.value,
+                line: token.line
+            };
+        }
+        if (this.matchDelimiter("(")) {
+            const expr = this.parseExpression();
+            this.consumeDelimiter(")", "expected ')' after expression");
+            return expr;
+        }
+        if (this.matchDelimiter("[")) {
+            const start = this.previous();
+            const elements = [];
+            if (!this.checkDelimiter("]")) {
+                do {
+                    elements.push(this.parseExpression());
+                } while (this.matchDelimiter(","));
+            }
+            this.consumeDelimiter("]", "expected ']' after list literal");
+            return {
+                type: "ListLiteral",
+                elements,
+                line: start.line
+            };
+        }
+        const token = this.peek();
+        throw new CompilerError(
+            "Syntax",
+            `unexpected token '${token.value ?? token.type}'`,
+            token.line,
+            token.column
+        );
+    }
+
+    buildBinary(left, operator, right) {
+        return {
+            type: "BinaryExpression",
+            operator: operator.value,
+            left,
+            right,
+            line: operator.line
+        };
+    }
+
+    buildLogical(left, keyword, right) {
+        return {
+            type: "LogicalExpression",
+            operator: keyword.value,
+            left,
+            right,
+            line: keyword.line
+        };
+    }
+
+    expectLineTerminator(message) {
+        if (this.match(TokenType.NEWLINE)) {
+            this.consumeNewlines();
+            return;
+        }
+        if (this.check(TokenType.EOF) || this.check(TokenType.DEDENT)) {
+            return;
+        }
+        const token = this.peek();
+        throw new CompilerError("Syntax", message, token.line, token.column);
+    }
+
+    consumeNewlines() {
+        while (this.match(TokenType.NEWLINE)) {
+            // loop
+        }
+    }
+
+    consume(type, message) {
+        if (this.check(type)) {
+            return this.advance();
+        }
+        const token = this.peek();
+        throw new CompilerError("Syntax", message, token.line, token.column);
+    }
+
+    consumeDelimiter(value, message) {
+        if (this.checkDelimiter(value)) {
+            return this.advance();
+        }
+        const token = this.peek();
+        throw new CompilerError("Syntax", message, token.line, token.column);
+    }
+
+    consumeKeyword(value, message) {
+        const token = this.peek();
+        if (this.checkKeyword(value)) {
+            return this.advance();
+        }
+        throw new CompilerError("Syntax", message, token.line, token.column);
+    }
+
+    match(type) {
+        if (this.check(type)) {
+            this.advance();
+            return true;
+        }
+        return false;
+    }
+
+    matchDelimiter(value) {
+        if (this.checkDelimiter(value)) {
+            this.advance();
+            return true;
+        }
+        return false;
+    }
+
+    matchKeyword(value) {
+        if (this.checkKeyword(value)) {
+            return this.advance();
+        }
+        return null;
+    }
+
+    matchOperator(value) {
+        if (this.checkOperator(value)) {
+            return this.advance();
+        }
+        return null;
+    }
+
+    matchOperatorOneOf(operators) {
+        for (const op of operators) {
+            if (this.checkOperator(op)) {
+                return this.advance();
+            }
+        }
+        return null;
+    }
+
+    check(type) {
+        if (this.isAtEnd()) {
+            return false;
+        }
+        return this.peek().type === type;
+    }
+
+    checkKeyword(value) {
+        if (this.isAtEnd()) {
+            return false;
+        }
+        const token = this.peek();
+        return token.type === TokenType.KEYWORD && token.value === value;
+    }
+
+    checkDelimiter(value) {
+        if (this.isAtEnd()) {
+            return false;
+        }
+        const token = this.peek();
+        return token.type === TokenType.DELIMITER && token.value === value;
+    }
+
+    checkOperator(value) {
+        if (this.isAtEnd()) {
+            return false;
+        }
+        const token = this.peek();
+        return token.type === TokenType.OPERATOR && token.value === value;
+    }
+
+    advance() {
+        if (!this.isAtEnd()) {
+            this.current++;
+        }
+        return this.previous();
+    }
+
+    previous() {
+        return this.tokens[this.current - 1];
+    }
+
+    peek() {
+        return this.tokens[this.current];
+    }
+
+    isAtEnd() {
+        return this.peek().type === TokenType.EOF;
+    }
+}
+
+===== File: assets\img\icon-save.svg =====
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="#0d0f0e" stroke="#00ff41" stroke-width="1.5" />
+    <path d="M7 3h10v6H7z" fill="#00ff41" />
+    <rect x="8" y="13" width="8" height="6" rx="1" fill="#021408" stroke="#00ff41" stroke-width="1.2" />
+    <rect x="10" y="5" width="4" height="2" fill="#021408" />
+</svg>
+
+===== File: README.md =====
+# PyMatrix Compiler
+
+Interactive single-page playground that simulates a miniature Python compiler pipeline — lexer, parser, and executor — entirely in JavaScript with a classic green-on-black terminal aesthetic.
+
+## Features
+
+- **Lexical analysis** with indentation tracking, keyword/operator recognition, number and string literals, and friendly lexical error reporting.
+- **Recursive-descent parser** that builds an AST with operator precedence, control flow (if/elif/else, for, while, do-while), function declarations, and helpful syntax diagnostics.
+- **Interpreter/runtime** that executes the AST with variable scoping, functions, multiple loop forms, conditional logic, and lightweight type checks.
+- **List handling** via Python-style literals, indexing, and concatenation semantics.
+- **Diagnostics panel** that surfaces compilation timings, runtime logs, and error messages using the themed color palette.
+- **Built-in helpers** such as `range()` to make loop demos friendlier.
+
+## Saving Code
+
+Use the floppy icon beside the run button to export the current editor contents as a `.py` file directly from the browser.
+
+## Running
+
+Simply open `index.html` in a modern browser (Chrome, Edge, Firefox). No build step required.
+
+## Layout
+
+```
+index.html
+assets/
+  css/theme.css
+  js/app.js
+  js/compiler.js
+  js/errors.js
+  js/interpreter.js
+  js/lexer.js
+  js/parser.js
+```
+
+## Extending
+
+- Update `assets/js/lexer.js` to add new tokens or literal forms.
+- Extend grammar rules in `assets/js/parser.js`.
+- Implement new runtime features or built-ins inside `assets/js/interpreter.js`.
+
+Enjoy hacking on the neon terminal compiler!
+
+

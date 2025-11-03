@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PyMatrix Compiler</title>
+    <link rel="stylesheet" href="assets/css/theme.css" />
+</head>
+<body>
+    <header class="top-bar">
+        <div class="branding">
+            <img src="assets/img/Python Logo.png" alt="PyMatrix logo" class="brand-logo" />
+            <div class="brand-text">
+                <span class="brand-title">PyMatrix Compiler</span>
+                <span class="brand-subtitle">Python Basics Lab</span>
+            </div>
+        </div>
+        <div class="status-indicator" id="status-indicator">ready</div>
+    </header>
+
+    <main class="workspace">
+        <section class="editor-panel">
+            <div class="panel-header">
+                <span>Source Code</span>
+                <select id="example-select" class="example-select">
+                    <option value="custom">Custom code</option>
+                </select>
+            </div>
+            <textarea id="source-editor" spellcheck="false"></textarea>
+            <div class="controls">
+                <button class="primary-btn" id="run-btn">Run Program</button>
+                <button class="icon-btn" id="save-btn" type="button" aria-label="Download source">
+                    <img src="assets/img/icon-save.svg" alt="" />
+                </button>
+                <button class="secondary-btn" id="reset-btn">Reset</button>
+            </div>
+        </section>
+
+        <section class="output-panel">
+            <div class="panel-header">
+                <span>Output</span>
+            </div>
+            <pre class="output-console" id="output-console"></pre>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-section">
+            <span class="footer-title">Feature Checklist</span>
+            <ul>
+                <li>Variables &amp; arithmetic</li>
+                <li>Print statements</li>
+                <li>If/Elif/Else conditionals</li>
+                <li>While &amp; do-while loops</li>
+                <li>For loops with range()</li>
+                <li>Lists (arrays)</li>
+                <li>Functions &amp; returns</li>
+                <li>Type checking &amp; diagnostics</li>
+            </ul>
+        </div>
+    </footer>
+
+    <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
