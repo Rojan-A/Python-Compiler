@@ -1,6 +1,6 @@
 # PyMatrix Compiler
 
-A hands-on playground we built to explore how Python compilers work. This single-page web app simulates a complete Python compiler pipeline with lexer, parser, and executor - all written in JavaScript and styled with that classic green-on-black terminal look that reminds me of the Matrix.
+An educational Python compiler built to explore how Python compilers work. This single-page web app simulates a complete Python compiler pipeline with lexer, parser, and executor - all written in JavaScript and styled with that classic green-on-black terminal look that reminds me of the Matrix.
 
 ## What It Does
 
