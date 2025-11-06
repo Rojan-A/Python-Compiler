@@ -2,6 +2,10 @@ import { lex } from "./lexer.js";
 import { parse } from "./parser.js";
 import { Interpreter } from "./interpreter.js";
 
+// ========================
+// Compiler Entry Point
+// ========================
+// Chain lexer → parser → interpreter to compile and execute Python code
 export function compileAndRun(source) {
     const tokens = lex(source);
     const ast = parse(tokens);

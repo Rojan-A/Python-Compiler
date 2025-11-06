@@ -30,7 +30,10 @@ Generated on 2025-11-03
                     <option value="custom">Custom code</option>
                 </select>
             </div>
-            <textarea id="source-editor" spellcheck="false"></textarea>
+            <div class="editor-wrapper">
+                <pre class="line-numbers" id="line-numbers" aria-hidden="true">1</pre>
+                <textarea id="source-editor" spellcheck="false"></textarea>
+            </div>
             <div class="controls">
                 <button class="primary-btn" id="run-btn">Run Program</button>
                 <button class="icon-btn" id="save-btn" type="button" aria-label="Download source">
@@ -70,6 +73,9 @@ Generated on 2025-11-03
 
 ===== File: assets\css\theme.css =====
 :root {
+    /* ========================
+       CSS Variables - Matrix Theme
+       ======================== */
     --bg: #0d0f0e;
     --primary-text: #00ff41;
     --keyword: #4caf50;
@@ -86,6 +92,9 @@ Generated on 2025-11-03
     --font-body: "Fira Code", "Cascadia Code", Consolas, monospace;
 }
 
+/* ========================
+   Global Styles
+   ======================== */
 * {
     box-sizing: border-box;
 }
@@ -101,6 +110,9 @@ body {
     letter-spacing: 0.02em;
 }
 
+/* ========================
+   Top Navigation Bar
+   ======================== */
 .top-bar {
     display: flex;
     justify-content: space-between;
@@ -174,6 +186,9 @@ body {
     color: var(--output);
 }
 
+/* ========================
+   Main Workspace Layout
+   ======================== */
 .workspace {
     display: grid;
     grid-template-columns: minmax(320px, 45%) 1fr;
@@ -201,7 +216,6 @@ body {
 
 .panel-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--panel-border);
@@ -214,12 +228,59 @@ body {
 textarea {
     width: 100%;
     min-height: 340px;
-    background: var(--card-bg);
-    border: 1px solid var(--panel-border);
+    background: transparent;
+    border: none;
     color: var(--primary-text);
     font: 0.95rem/1.5 var(--font-body);
     padding: 1rem;
-    resize: vertical;
+    resize: none;
+    outline: none;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.current-line-highlight {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    background: rgba(0, 255, 65, 0.08);
+    pointer-events: none;
+    z-index: 0;
+    transition: transform 0.08s ease;
+    opacity: 0;
+}
+
+.editor-wrapper:focus-within .current-line-highlight {
+    opacity: 1;
+}
+
+.editor-wrapper {
+    display: flex;
+    background: var(--card-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.line-numbers {
+    margin: 0;
+    padding: 1rem 0.75rem;
+    background: rgba(0, 255, 65, 0.04);
+    border-right: 1px solid var(--panel-border);
+    color: var(--comment);
+    text-align: right;
+    min-width: 2.5rem;
+    user-select: none;
+    pointer-events: none;
+    font: 0.95rem/1.5 var(--font-body);
+    line-height: 1.5;
+    white-space: pre;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 
 .controls {
@@ -356,14 +417,22 @@ footer ul {
 import { compileAndRun } from "./compiler.js";
 import { CompilerError } from "./errors.js";
 
+// ========================
+// DOM Element References
+// ========================
 const editor = document.getElementById("source-editor");
+const lineNumbers = document.getElementById("line-numbers");
 const runBtn = document.getElementById("run-btn");
 const resetBtn = document.getElementById("reset-btn");
 const saveBtn = document.getElementById("save-btn");
 const exampleSelect = document.getElementById("example-select");
 const outputConsole = document.getElementById("output-console");
 const statusIndicator = document.getElementById("status-indicator");
+const currentLineHighlight = document.querySelector(".current-line-highlight");
 
+// ========================
+// Constants
+// ========================
 const NO_OUTPUT_PLACEHOLDER = "[no output]";
 const DEFAULT_DOWNLOAD_NAME = "pymatrix_program";
 const COMPILATION_DELAY_MS = 1500;
@@ -446,6 +515,8 @@ function loadInitialExample() {
     exampleSelect.value = firstExample.id;
     editor.value = firstExample.code;
     clearConsole();
+    updateLineNumbers();
+    syncLineNumberScroll();
 }
 
 function registerEvents() {
@@ -458,6 +529,9 @@ function registerEvents() {
         editor.value = "";
         clearConsole();
         setStatus("ready", "ready");
+        editor.scrollTop = 0;
+        updateLineNumbers();
+        syncLineNumberScroll();
     });
 
     saveBtn.addEventListener("click", () => {
@@ -473,7 +547,19 @@ function registerEvents() {
             editor.value = selection.code;
             clearConsole();
             setStatus("ready", selection.label.toLowerCase());
+            editor.scrollTop = 0;
+            updateLineNumbers();
+            syncLineNumberScroll();
         }
+    });
+
+    editor.addEventListener("input", () => {
+        updateLineNumbers();
+        syncLineNumberScroll();
+    });
+
+    editor.addEventListener("scroll", () => {
+        syncLineNumberScroll();
     });
 }
 
@@ -607,11 +693,32 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
+function updateLineNumbers() {
+    if (!lineNumbers) {
+        return;
+    }
+    const lines = editor.value.split(/\r\n|\r|\n/).length;
+    const total = Math.max(lines, 1);
+    const numbers = Array.from({ length: total }, (_, index) => index + 1).join("\n");
+    lineNumbers.textContent = numbers;
+}
+
+function syncLineNumberScroll() {
+    if (!lineNumbers) {
+        return;
+    }
+    lineNumbers.scrollTop = editor.scrollTop;
+}
+
 ===== File: assets\js\compiler.js =====
 import { lex } from "./lexer.js";
 import { parse } from "./parser.js";
 import { Interpreter } from "./interpreter.js";
 
+// ========================
+// Compiler Entry Point
+// ========================
+// Chain lexer → parser → interpreter to compile and execute Python code
 export function compileAndRun(source) {
     const tokens = lex(source);
     const ast = parse(tokens);
@@ -624,6 +731,10 @@ export function compileAndRun(source) {
 }
 
 ===== File: assets\js\errors.js =====
+// ========================
+// Error Handling
+// ========================
+// Represents compiler/runtime errors with location information
 export class CompilerError extends Error {
     constructor(stage, message, line = null, column = null) {
         const location = line !== null ? ` (line ${line}${column !== null ? ", col " + column : ""})` : "";
@@ -635,6 +746,7 @@ export class CompilerError extends Error {
     }
 }
 
+// Control flow signal used to implement function returns
 export class ReturnSignal {
     constructor(value = null) {
         this.value = value;
@@ -1041,6 +1153,9 @@ export class Interpreter {
 ===== File: assets\js\lexer.js =====
 import { CompilerError } from "./errors.js";
 
+// ========================
+// Token Type Definitions
+// ========================
 export const TokenType = {
     IDENTIFIER: "IDENTIFIER",
     KEYWORD: "KEYWORD",
@@ -1054,6 +1169,10 @@ export const TokenType = {
     EOF: "EOF"
 };
 
+// ========================
+// Lexer Configuration
+// ========================
+// Python keywords recognized by the lexer
 const KEYWORDS = new Set([
     "if",
     "else",
@@ -1070,24 +1189,34 @@ const KEYWORDS = new Set([
     "None"
 ]);
 
+// Multi-character operators (must be checked before single-character operators)
 const MULTI_CHAR_OPERATORS = ["==", "!=", "<=", ">=", "//", "**"];
 
+// Single-character operators
 const SINGLE_CHAR_OPERATORS = new Set(["+", "-", "*", "/", "%", "=", "<", ">"]);
 
+// Delimiter characters (parentheses, brackets, colons, commas)
 const DELIMITERS = new Set(["(", ")", "[", "]", ":", ","]);
 
+// ========================
+// Helper Functions
+// ========================
+// Normalize line endings to Unix style
 function sanitize(source) {
     return source.replace(/\r\n?/g, "\n");
 }
 
+// Check if character is alphabetic or underscore
 function isAlpha(ch) {
     return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || ch === "_";
 }
 
+// Check if character is a decimal digit
 function isDigit(ch) {
     return ch >= "0" && ch <= "9";
 }
 
+// Check if character is alphanumeric (letter, digit, or underscore)
 function isAlphaNumeric(ch) {
     return isAlpha(ch) || isDigit(ch);
 }
@@ -1096,6 +1225,7 @@ function createToken(type, value, line, column) {
     return { type, value, line, column };
 }
 
+// Tokenize Python source code into a stream of tokens with proper indentation tracking
 export function lex(source) {
     const tokens = [];
     const indentStack = [0];
@@ -1298,6 +1428,10 @@ export function lex(source) {
 import { CompilerError } from "./errors.js";
 import { TokenType } from "./lexer.js";
 
+// ========================
+// Parse Entry Point
+// ========================
+// Convert tokens into an Abstract Syntax Tree (AST)
 export function parse(tokens) {
     const parser = new Parser(tokens);
     const body = parser.parseProgram();

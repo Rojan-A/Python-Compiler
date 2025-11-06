@@ -1,5 +1,8 @@
 import { CompilerError } from "./errors.js";
 
+// ========================
+// Token Type Definitions
+// ========================
 export const TokenType = {
     IDENTIFIER: "IDENTIFIER",
     KEYWORD: "KEYWORD",
@@ -13,6 +16,10 @@ export const TokenType = {
     EOF: "EOF"
 };
 
+// ========================
+// Lexer Configuration
+// ========================
+// Python keywords recognized by the lexer
 const KEYWORDS = new Set([
     "if",
     "else",
@@ -31,32 +38,44 @@ const KEYWORDS = new Set([
     "None"
 ]);
 
+// Multi-character operators (must be checked before single-character operators)
 const MULTI_CHAR_OPERATORS = ["==", "!=", "<=", ">=", "//", "**"];
 
+// Single-character operators
 const SINGLE_CHAR_OPERATORS = new Set(["+", "-", "*", "/", "%", "=", "<", ">"]);
 
+// Delimiter characters (parentheses, brackets, colons, commas)
 const DELIMITERS = new Set(["(", ")", "[", "]", ":", ","]);
 
+// ========================
+// Helper Functions
+// ========================
+// Normalize line endings to Unix style
 function sanitize(source) {
     return source.replace(/\r\n?/g, "\n");
 }
 
+// Check if character is alphabetic or underscore
 function isAlpha(ch) {
     return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || ch === "_";
 }
 
+// Check if character is a decimal digit
 function isDigit(ch) {
     return ch >= "0" && ch <= "9";
 }
 
+// Check if character is alphanumeric (letter, digit, or underscore)
 function isAlphaNumeric(ch) {
     return isAlpha(ch) || isDigit(ch);
 }
 
+// Create a token object with type, value, and source position information
 function createToken(type, value, line, column) {
     return { type, value, line, column };
 }
 
+// Tokenize Python source code into a stream of tokens with proper indentation tracking
 export function lex(source) {
     const tokens = [];
     const indentStack = [0];

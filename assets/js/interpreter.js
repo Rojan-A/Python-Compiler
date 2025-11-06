@@ -1,5 +1,9 @@
 import { CompilerError, ReturnSignal } from "./errors.js";
 
+// ========================
+// Environment (Scope)
+// ========================
+// Manages variable definitions and scoping (lexical scope chains)
 class Environment {
     constructor(parent = null) {
         this.parent = parent;
@@ -43,6 +47,10 @@ class Environment {
     }
 }
 
+// ========================
+// User Function
+// ========================
+// Represents a user-defined function with its declaration and closure
 class UserFunction {
     constructor(declaration, closure) {
         this.declaration = declaration;
@@ -71,11 +79,16 @@ class UserFunction {
     }
 }
 
+// ========================
+// Interpreter
+// ========================
+// Executes AST nodes and manages program execution state
 export class Interpreter {
     constructor() {
         this.reset();
     }
 
+    // Initialize and reset the interpreter state
     reset() {
         this.output = [];
         this.logs = [];
@@ -83,6 +96,7 @@ export class Interpreter {
         this.installBuiltins();
     }
 
+    // Register built-in functions (print, range) in global environment
     installBuiltins() {
         const printFn = {
             arity: null,
@@ -143,6 +157,7 @@ export class Interpreter {
         this.globalEnv.define("None", null);
     }
 
+    // Execute an AST program and return output and logs
     run(program) {
         this.reset();
         try {
@@ -157,6 +172,7 @@ export class Interpreter {
         }
     }
 
+    // Execute a block of statements in a given environment
     executeBlock(statements, environment) {
         for (const statement of statements) {
             const result = this.execute(statement, environment);
@@ -167,6 +183,7 @@ export class Interpreter {
         return null;
     }
 
+    // Dispatch execution based on node type
     execute(node, env) {
         switch (node.type) {
             case "Assignment":
@@ -189,6 +206,7 @@ export class Interpreter {
         }
     }
 
+    // Execute variable assignment
     executeAssignment(node, env) {
         const value = this.evaluate(node.value, env);
         if (env.has(node.target)) {
@@ -199,6 +217,7 @@ export class Interpreter {
         return null;
     }
 
+    // Execute an if statement with optional else/elif branches
     executeIf(node, env) {
         const condition = this.evaluate(node.test, env);
         this.assertBoolean(condition, node.line, "if condition must be boolean");
@@ -217,6 +236,7 @@ export class Interpreter {
         return null;
     }
 
+    // Execute a while loop
     executeWhile(node, env) {
         while (true) {
             const condition = this.evaluate(node.test, env);
@@ -232,6 +252,7 @@ export class Interpreter {
         return null;
     }
 
+    // Execute a for loop
     executeFor(node, env) {
         const iterable = this.evaluate(node.iterable, env);
         const items = this.collectIterableItems(iterable, node.line);
@@ -249,17 +270,20 @@ export class Interpreter {
         return null;
     }
 
+    // Execute a function declaration
     executeFunctionDeclaration(node, env) {
         const fn = new UserFunction(node, env);
         env.define(node.name, fn);
         return null;
     }
 
+    // Execute a return statement
     executeReturn(node, env) {
         const value = node.argument ? this.evaluate(node.argument, env) : null;
         return new ReturnSignal(value);
     }
 
+    // Dispatch evaluation based on expression type
     evaluate(node, env) {
         switch (node.type) {
             case "NumberLiteral":

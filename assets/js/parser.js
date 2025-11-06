@@ -1,18 +1,27 @@
 import { CompilerError } from "./errors.js";
 import { TokenType } from "./lexer.js";
 
+// ========================
+// Parse Entry Point
+// ========================
+// Convert tokens into an Abstract Syntax Tree (AST)
 export function parse(tokens) {
     const parser = new Parser(tokens);
     const body = parser.parseProgram();
     return { type: "Program", body };
 }
 
+// ========================
+// Parser Class
+// ========================
+// Recursive descent parser that builds an AST from tokens
 class Parser {
     constructor(tokens) {
         this.tokens = tokens;
         this.current = 0;
     }
 
+    // Parse a complete program (sequence of statements at module level)
     parseProgram() {
         const statements = [];
         this.consumeNewlines();
@@ -26,6 +35,7 @@ class Parser {
         return statements;
     }
 
+    // Parse a single statement (if, while, for, def, return, or simple statement)
     parseStatement() {
         if (this.checkKeyword("if")) {
             return this.parseIfStatement();
@@ -45,6 +55,7 @@ class Parser {
         return this.parseSimpleStatement();
     }
 
+    // Parse an if statement with optional elif and else clauses
     parseIfStatement() {
         const ifToken = this.consumeKeyword("if", "expected 'if'");
         const test = this.parseExpression();
@@ -67,6 +78,7 @@ class Parser {
         };
     }
 
+    // Parse elif continuation (recursively handles elif chains)
     parseElifChain() {
         const elifToken = this.consumeKeyword("elif", "expected 'elif'");
         const test = this.parseExpression();
@@ -89,6 +101,7 @@ class Parser {
         };
     }
 
+    // Parse a while loop statement
     parseWhileStatement() {
         const whileToken = this.consumeKeyword("while", "expected 'while'");
         const test = this.parseExpression();
@@ -102,6 +115,7 @@ class Parser {
         };
     }
 
+    // Parse a for loop statement
     parseForStatement() {
         const forToken = this.consumeKeyword("for", "expected 'for'");
         const iterator = this.consume(TokenType.IDENTIFIER, "expected loop variable name");
@@ -118,6 +132,7 @@ class Parser {
         };
     }
 
+    // Parse a function definition
     parseFunctionDeclaration() {
         const defToken = this.consumeKeyword("def", "expected 'def'");
         const nameToken = this.consume(TokenType.IDENTIFIER, "expected function name");
@@ -141,6 +156,7 @@ class Parser {
         };
     }
 
+    // Parse a return statement
     parseReturnStatement() {
         const token = this.consumeKeyword("return", "expected 'return'");
         let value = null;
@@ -155,6 +171,7 @@ class Parser {
         };
     }
 
+    // Parse a simple statement (assignment or expression)
     parseSimpleStatement() {
         const expression = this.parseExpression();
         if (this.matchOperator("=")) {
@@ -183,6 +200,7 @@ class Parser {
         };
     }
 
+    // Parse an indented suite of statements (code block)
     parseSuite() {
         if (this.match(TokenType.NEWLINE)) {
             this.consume(TokenType.INDENT, "expected an indented block");
@@ -199,10 +217,12 @@ class Parser {
         return [single];
     }
 
+    // Parse an expression (top level of operator precedence)
     parseExpression() {
         return this.parseOr();
     }
 
+    // Parse logical OR (lowest precedence)
     parseOr() {
         let expr = this.parseAnd();
         while (true) {
@@ -216,6 +236,7 @@ class Parser {
         return expr;
     }
 
+    // Parse logical AND
     parseAnd() {
         let expr = this.parseEquality();
         while (true) {
@@ -229,6 +250,7 @@ class Parser {
         return expr;
     }
 
+    // Parse equality operators (== and !=)
     parseEquality() {
         let expr = this.parseComparison();
         while (true) {
@@ -242,6 +264,7 @@ class Parser {
         return expr;
     }
 
+    // Parse comparison operators (<, >, <=, >=)
     parseComparison() {
         let expr = this.parseTerm();
         while (true) {
@@ -255,6 +278,7 @@ class Parser {
         return expr;
     }
 
+    // Parse addition and subtraction
     parseTerm() {
         let expr = this.parseFactor();
         while (true) {
@@ -268,6 +292,7 @@ class Parser {
         return expr;
     }
 
+    // Parse multiplication, division, and modulo
     parseFactor() {
         let expr = this.parseUnary();
         while (true) {
@@ -281,6 +306,7 @@ class Parser {
         return expr;
     }
 
+    // Parse unary operators (not, -, +)
     parseUnary() {
         const keyword = this.matchKeyword("not");
         if (keyword) {
@@ -305,6 +331,7 @@ class Parser {
         return this.parseCall();
     }
 
+    // Parse function calls and subscripts
     parseCall() {
         let expr = this.parsePrimary();
         while (true) {
@@ -339,6 +366,7 @@ class Parser {
         return expr;
     }
 
+    // Parse primary expressions (literals, identifiers, parenthesized expressions, lists)
     parsePrimary() {
         if (this.match(TokenType.NUMBER)) {
             const token = this.previous();

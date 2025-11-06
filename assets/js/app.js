@@ -1,7 +1,12 @@
 import { compileAndRun } from "./compiler.js";
 import { CompilerError } from "./errors.js";
 
+// ========================
+// DOM Element References
+// ========================
 const editor = document.getElementById("source-editor");
+const lineNumbers = document.getElementById("line-numbers");
+const editorWrapper = document.querySelector(".editor-wrapper");
 const runBtn = document.getElementById("run-btn");
 const resetBtn = document.getElementById("reset-btn");
 const saveBtn = document.getElementById("save-btn");
@@ -9,6 +14,9 @@ const exampleSelect = document.getElementById("example-select");
 const outputConsole = document.getElementById("output-console");
 const statusIndicator = document.getElementById("status-indicator");
 
+// ========================
+// Constants
+// ========================
 const NO_OUTPUT_PLACEHOLDER = "[no output]";
 const DEFAULT_DOWNLOAD_NAME = "pymatrix_program";
 const COMPILATION_DELAY_MS = 1500;
@@ -17,7 +25,7 @@ const EXAMPLES = [
     {
         id: "print",
         label: "PRINT",
-        code: "greetings = \"Hello PyMatrix\"\ndeveloper = \"Group 6\"\ncourse = \"Principles of Programming Languages\"\nprogram = \"BS in Computer Science\"\nproject = \"Interpreter or Compiler Simulation\"\nprint(\"=== PyMatrix Compiler Demo ===\")\nprint(greetings)\nprint(\"Developed by:\", developer)\nprint(\"Course:\", course)\nprint(\"Degree Program:\", program)\nprint(\"Project:\", project)\nprint(\"==============================\")\n"
+        code: "greetings = \"Hello PyMatrix\"\ndeveloper = \"Group 6\"\ncourse = \"Principles of Programming Languages\"\nprogram = \"BS in Computer Science\"\nproject = \"Interpreter or Compiler Simulation\"\nprint(\"========= PyMatrix Compiler Demo =========\")\nprint(greetings)\nprint(\"Developed by:\", developer)\nprint(\"Course:\", course)\nprint(\"Degree Program:\", program)\nprint(\"Project:\", project)\nprint(\"==========================================\")\n"
     },
     {
         id: "variables-arithmetic",
@@ -66,10 +74,25 @@ const EXAMPLES = [
     }
 ];
 
+// ========================
+// State Variables
+// ========================
 let pendingRunTimer = null;
+let cachedLineHeight = null;
+let currentLineHighlight = null;
+
+// Initialize the current line highlight overlay
+if (editorWrapper) {
+    currentLineHighlight = document.createElement("div");
+    currentLineHighlight.className = "current-line-highlight";
+    editorWrapper.insertBefore(currentLineHighlight, editorWrapper.firstChild);
+}
 
 initialize();
 
+// ========================
+// Initialization
+// ========================
 function initialize() {
     populateExampleMenu();
     loadInitialExample();
@@ -77,6 +100,7 @@ function initialize() {
     setStatus("ready", "ready");
 }
 
+// Populate the example dropdown menu
 function populateExampleMenu() {
     EXAMPLES.forEach((example) => {
         const option = document.createElement("option");
@@ -86,13 +110,20 @@ function populateExampleMenu() {
     });
 }
 
+// Load and display the first example on startup
 function loadInitialExample() {
     const firstExample = EXAMPLES[0];
     exampleSelect.value = firstExample.id;
     editor.value = firstExample.code;
     clearConsole();
+    updateLineNumbers();
+    syncLineNumberScroll();
+    updateCurrentLineHighlight();
 }
 
+// ========================
+// Event Handlers Setup
+// ========================
 function registerEvents() {
     runBtn.addEventListener("click", () => {
         handleRun();
@@ -103,6 +134,10 @@ function registerEvents() {
         editor.value = "";
         clearConsole();
         setStatus("ready", "ready");
+        editor.scrollTop = 0;
+        updateLineNumbers();
+        syncLineNumberScroll();
+        updateCurrentLineHighlight();
     });
 
     saveBtn.addEventListener("click", () => {
@@ -118,10 +153,53 @@ function registerEvents() {
             editor.value = selection.code;
             clearConsole();
             setStatus("ready", selection.label.toLowerCase());
+            editor.scrollTop = 0;
+            updateLineNumbers();
+            syncLineNumberScroll();
+            updateCurrentLineHighlight();
         }
+    });
+
+    editor.addEventListener("input", () => {
+        updateLineNumbers();
+        syncLineNumberScroll();
+        updateCurrentLineHighlight();
+    });
+
+    editor.addEventListener("scroll", () => {
+        syncLineNumberScroll();
+        updateCurrentLineHighlight();
+    });
+
+    editor.addEventListener("keyup", () => {
+        updateCurrentLineHighlight();
+    });
+
+    editor.addEventListener("click", () => {
+        updateCurrentLineHighlight();
+    });
+
+    editor.addEventListener("mouseup", () => {
+        updateCurrentLineHighlight();
+    });
+
+    editor.addEventListener("focus", () => {
+        updateCurrentLineHighlight();
+    });
+
+    editor.addEventListener("blur", () => {
+        updateCurrentLineHighlight();
+    });
+
+    window.addEventListener("resize", () => {
+        cachedLineHeight = null;
+        updateCurrentLineHighlight();
     });
 }
 
+// ========================
+// Run / Compile Handler
+// ========================
 function handleRun() {
     if (pendingRunTimer !== null) {
         clearTimeout(pendingRunTimer);
@@ -151,6 +229,9 @@ function handleRun() {
     }, COMPILATION_DELAY_MS);
 }
 
+// ========================
+// Save Handler
+// ========================
 function handleSave() {
     const source = editor.value;
     const fileName = buildDownloadFileName();
@@ -158,6 +239,7 @@ function handleSave() {
     setStatus("success", "downloaded");
 }
 
+// Generate a filename for the downloaded code
 function buildDownloadFileName() {
     const activeId = exampleSelect.value;
     if (activeId && activeId !== "custom") {
@@ -167,6 +249,7 @@ function buildDownloadFileName() {
     return `${DEFAULT_DOWNLOAD_NAME}_${timestamp}.py`;
 }
 
+// Format a date as YYYYMMDDHHMMSS timestamp string
 function formatTimestamp(date) {
     return [
         date.getFullYear(),
@@ -178,10 +261,12 @@ function formatTimestamp(date) {
     ].join("");
 }
 
+// Pad a number with leading zero if needed
 function padNumber(value) {
     return String(value).padStart(2, "0");
 }
 
+// Trigger browser download for the given content
 function triggerDownload(content, fileName) {
     const blob = new Blob([content], { type: "text/x-python;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -194,6 +279,9 @@ function triggerDownload(content, fileName) {
     URL.revokeObjectURL(url);
 }
 
+// ========================
+// Console & UI Helpers
+// ========================
 function renderConsole(outputLines, message, isError = false) {
     const lines = outputLines && outputLines.length > 0 ? outputLines : [NO_OUTPUT_PLACEHOLDER];
     const safeLines = lines.map((line) => escapeHtml(line));
@@ -204,6 +292,7 @@ function renderConsole(outputLines, message, isError = false) {
     outputConsole.innerHTML = parts.join("");
 }
 
+// Display compilation or runtime errors in the console
 function handleError(error) {
     if (error instanceof CompilerError) {
         renderConsole(
@@ -223,15 +312,18 @@ function handleError(error) {
     }
 }
 
+// Clear the output console
 function clearConsole() {
     outputConsole.innerHTML = "";
 }
 
+// Update the status indicator message and state
 function setStatus(state, text) {
     statusIndicator.dataset.state = state;
     statusIndicator.textContent = text;
 }
 
+// Extract the final message from execution logs
 function getFinalMessage(logs) {
     if (!Array.isArray(logs) || logs.length === 0) {
         return "Execution finished.";
@@ -243,6 +335,7 @@ function getFinalMessage(logs) {
     return lastEntry.message;
 }
 
+// Escape HTML special characters for safe display in the console
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, "&amp;")
@@ -250,4 +343,68 @@ function escapeHtml(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
+}
+
+// Generate line numbers based on the number of lines in the editor
+function updateLineNumbers() {
+    if (!lineNumbers) {
+        return;
+    }
+    const lines = editor.value.split(/\r\n|\r|\n/).length;
+    const total = Math.max(lines, 1);
+    const numbers = Array.from({ length: total }, (_, index) => index + 1).join("\n");
+    lineNumbers.textContent = numbers;
+    updateCurrentLineHighlight();
+}
+
+// Keep line numbers scrolled in sync with the code editor
+function syncLineNumberScroll() {
+    if (!lineNumbers) {
+        return;
+    }
+    lineNumbers.scrollTop = editor.scrollTop;
+}
+
+// Position the current line highlight overlay based on caret position
+function updateCurrentLineHighlight() {
+    if (!currentLineHighlight || !editor) {
+        return;
+    }
+
+    const metrics = getEditorMetrics();
+    if (!metrics) {
+        return;
+    }
+
+    const { lineHeight, paddingTop } = metrics;
+    const caretIndex = editor.selectionStart ?? 0;
+    const textBeforeCaret = editor.value.slice(0, caretIndex);
+    const currentLine = textBeforeCaret.split(/\r\n|\r|\n/).length - 1;
+    const topOffset = paddingTop + currentLine * lineHeight - editor.scrollTop;
+
+    currentLineHighlight.style.height = `${lineHeight}px`;
+    currentLineHighlight.style.transform = `translateY(${topOffset}px)`;
+}
+
+// Extract computed style metrics (line height and padding) from the editor textarea
+function getEditorMetrics() {
+    if (!editor) {
+        return null;
+    }
+    if (!cachedLineHeight) {
+        const computed = window.getComputedStyle(editor);
+        const lineHeight = parseFloat(computed.lineHeight);
+        if (!Number.isNaN(lineHeight)) {
+            cachedLineHeight = lineHeight;
+        } else {
+            const fontSize = parseFloat(computed.fontSize) || 16;
+            cachedLineHeight = fontSize * 1.5;
+        }
+    }
+    const computed = window.getComputedStyle(editor);
+    const paddingTop = parseFloat(computed.paddingTop) || 0;
+    return {
+        lineHeight: cachedLineHeight,
+        paddingTop
+    };
 }
